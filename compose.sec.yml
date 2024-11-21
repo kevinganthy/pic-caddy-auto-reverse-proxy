@@ -1,0 +1,51 @@
+services:
+  static_response:
+    image: caddy:alpine
+    networks:
+      - caddy
+    labels:
+      caddy: "static_response.localhost"
+      caddy.respond: / "Hello static" 200
+
+  front:
+    build:
+      context: ./front
+    networks:
+      - caddy
+    volumes:
+      - ./front:/app
+      - /app/node_modules
+    labels:
+      caddy: "front.localhost"
+      caddy.reverse_proxy: "{{upstreams 5173}}"
+
+  pocketbase:
+    image: kevinganthy/pocketpoc
+    environment:
+      - POCKET_PORT=8090
+      - POCKET_URL=0.0.0.0
+      - HELLO_WORLD_RESPONSE=Hello World from Caddy auto-reverse-proxy!
+    networks:
+      - caddy
+    volumes:
+      - pocket_data:/data
+    labels:
+      caddy: "pocket.localhost"
+      caddy.reverse_proxy: "{{upstreams 8090}}"
+
+  static_files:
+    image: nginx:alpine
+    networks:
+      - caddy
+    volumes:
+      - ./static:/usr/share/nginx/html:ro
+    labels:
+      caddy: "static_files.localhost"
+      caddy.reverse_proxy: "{{upstreams 80}}"
+
+networks:
+  caddy:
+    external: true
+
+volumes:
+  pocket_data: 
