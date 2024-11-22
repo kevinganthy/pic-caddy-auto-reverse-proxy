@@ -13,7 +13,7 @@ docker network create caddy
 Lancer le compose principal contenant le reverse proxy.
 
 ```bash
-docker-compose up -d
+docker compose up -d
 ```
 
 Url accessible à partir de ce point :
@@ -23,7 +23,7 @@ Url accessible à partir de ce point :
 Lancer le compose secondaire contenant les services à exposer à la volée.
 
 ```bash
-docker-compose -f compose.sec.yml up -d
+docker compose -f compose.sec.yml up -d
 ```
 
 Url accessible à partir de ce point :
